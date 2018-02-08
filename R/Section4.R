@@ -80,11 +80,11 @@ parSet.h = makeParamSet(
   makeNumericParam(id = "h", lower = 0, upper = 2, 
                    trafo = function(x) 10 ^ x))
 
-# control for tuning hyper parameters
-# use higher resolution in application
+# define grid search algorithm for hyper parameters
+# use higher grid resolution in application
 ctrl = makeTuneControlGrid(resolution = 10L)
 
-# control for resampling, use 5 fold CV
+# use 5 fold CV for hyper parameter tuning
 rdesc = makeResampleDesc("CV", iters = 5)
 
 # create tuned learner
@@ -143,7 +143,7 @@ b.lrn4 = makeLearner("classif.classiFunc.knn",
 # Chunk 2
 
 # create LCE
-# set resampling to 10 fold CV (default is LOO-CV) for faster run time.
+# use 10 fold CV (default is leave-one-out-CV) for faster run time.
 LCE.lrn = makeStackedLearner(
   base.learners = list(b.lrn1, b.lrn2, b.lrn3, b.lrn4), 
   predict.type = "prob", 
@@ -153,10 +153,10 @@ LCE.lrn = makeStackedLearner(
 # create RFE
 RFE.lrn = makeStackedLearner(
   base.learners = list(b.lrn1, b.lrn2, b.lrn3, b.lrn4), 
-  super.learner = "classif.randomForest",
   predict.type = "prob",
-  method = "stack.cv", 
-  resampling = makeResampleDesc("CV", iters = 10L))
+  resampling = makeResampleDesc("CV", iters = 10L),
+  method = "stack.cv",
+  super.learner = "classif.randomForest")
 
 
 # Chunk 3
