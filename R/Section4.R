@@ -6,8 +6,7 @@
 # Chunk 1
 
 # install mlr package once
-# install.packages("mlr")
-# use the version on github if my pull request is not yet merged
+# install.packages("mlr") # use the version on github if my pull request is not yet merged
 devtools::install_github("maierhofert/mlr", ref = "classiFunc")
 
 # load mlr package in every new R-session
@@ -26,7 +25,7 @@ lrn.ker = makeLearner(cl = "classif.classiFunc.kernel",
 # load BeetleFly example data
 data("BeetleFly", package = "classiFunc")
 BeetleFly = BeetleFly[,-ncol(BeetleFly)]
-# # export DTI data to mlr data format
+# # export BeetleFly data to mlr data format
 fdata = makeFunctionalData(BeetleFly, exclude.cols = c("target"))
 
 # create mlr task from data
@@ -37,7 +36,7 @@ set.seed(1)
 train.rows = sample(c(TRUE, FALSE), size = getTaskSize(task), 
                     replace = TRUE, prob = c(0.5, 0.5))
 
-# create separate tasks for test/train split
+# create separate tasks for train/test split
 task.train = subsetTask(task, subset = train.rows)
 task.test = subsetTask(task, subset = !train.rows)
 
@@ -65,11 +64,8 @@ table(pred = getPredictionResponse(pred.nn),
 table(pred = getPredictionResponse(pred.ker), 
       true = getTaskTargets(task.test))
 
-measureMMCE(getTaskTargets(task.test), getPredictionResponse(pred.nn))
-measureMMCE(getTaskTargets(task.test), getPredictionResponse(pred.ker))
-
-# get predicted probabilities
-getPredictionProbabilities(pred.ker)
+# # get predicted probabilities
+# getPredictionProbabilities(pred.ker)
 
 ################################################################################
 # Section 4.2 Automated Hyperparameter Tuning
@@ -95,9 +91,7 @@ rdesc = makeResampleDesc("CV", iters = 5)
 set.seed(1)
 lrn.bandwidth.tuned = makeTuneWrapper(learner = lrn.ker, 
                                       resampling = rdesc,
-                                      measures = mmce,
-                                      # measures = multiclass.brier,
-                                      # measures = brier,
+                                      measures = brier,
                                       par.set = parSet.h,
                                       control = ctrl)
 
@@ -112,12 +106,10 @@ pred.kern.tuned = predict(m.kern.tuned, task = task.test)
 # confusion matrix for kernel estimator
 table(pred = getPredictionResponse(pred.kern.tuned), 
       true = getTaskTargets(task.test))
-measureMMCE(getTaskTargets(task.test), getPredictionResponse(pred.kern.tuned))
 
-
-# Chunk 3
-# get predicted probabilities
-getPredictionProbabilities(pred.kern.tuned)
+# # Chunk 3
+# # get predicted probabilities
+# getPredictionProbabilities(pred.kern.tuned)
 
 
 ################################################################################
@@ -139,8 +131,8 @@ b.lrn2 = makeLearner("classif.classiFunc.knn",
                      predict.type = "prob")
 
 b.lrn3 = makeLearner("classif.classiFunc.knn", 
-                      id = "globMin",
-                      par.vals = list(metric = "globMin"), 
+                      id = "globMax",
+                      par.vals = list(metric = "globMax"), 
                       predict.type = "prob")
 
 b.lrn4 = makeLearner("classif.classiFunc.knn", 
