@@ -12,7 +12,6 @@ classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1,
              metric = "L2", ker = "Ker.norm", 
              nderiv = 0L, ...)
 
-
 # Chunk 2
 
 # install classiFunc package once
