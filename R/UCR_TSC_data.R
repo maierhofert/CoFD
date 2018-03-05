@@ -2,7 +2,7 @@
 # used in the benchmark experiment
 
 # Path to this R-File
-data_path = "Daten/TSC Problems"
+data_path = "Data/TSC Problems"
 
 # get names of all data sets
 data_names = list.dirs(data_path, full.names = FALSE, recursive = FALSE)
@@ -72,11 +72,11 @@ for (i in 1:length(tsks)) {
   obslen[i] = getTaskNFeats(tsks[[i]])
 }
 df = data.frame(name, nobs, obslen, nobs*obslen)
-hist(df$nobs...obslen, breaks = 100)
-summary(df$nobs...obslen)
-quantile(df$nobs...obslen, 0.4)
-df_red = df[df$nobs...obslen <= 100,]
-nrow(df_red)
+# hist(df$nobs...obslen, breaks = 100)
+# summary(df$nobs...obslen)
+# quantile(df$nobs...obslen, 0.4)
+# df_red = df[df$nobs...obslen <= 100,]
+# nrow(df_red)
 
 tsk_names = lapply(tsks, getTaskId)
 tsk_selection = tsk_names %in% c("FiftyWords")

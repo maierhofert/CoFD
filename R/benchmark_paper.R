@@ -7,16 +7,12 @@ if (on_server) {
   res = makeResampleDesc(method = "CV", predict = "test",
                          stratify = TRUE,
                          iters = 10)
-  # res = makeResampleDesc(method = "RepCV", predict = "test",
-  #                        stratify = TRUE,
-  #                        reps = 5,
-  #                        folds = 10L)
 } else {
   res = makeResampleDesc(method = "CV", predict = "test",
                          stratify = TRUE,
-                         iters = 2L)
-  lrns = lrns[c(1, 6)]
-  tsks = tsks[1:3]
+                         iters = 10L)
+  # lrns = lrns[c(1, 6)]
+  # tsks = tsks[1:3]
 }
 
 # resampling instances
