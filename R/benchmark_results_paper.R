@@ -5,21 +5,21 @@ library("ggplot2")
 mytheme = theme_bw(20)
 
 # read in most current benchmark
-bmr = readRDS("Benchmark_results/2017-11-29bmr_paper.RDS")
+bmr = readRDS("Benchmark_results/2018-03-06bmr_paper.RDS")
 name = "bmr_paper"
 
 # pretty labels for learners
 lrns.colors = c("grey20", "grey60",
                 "darkorange3",
+                "navy",
                 # "orange1", "goldenrod", 
                 #
                 # "navy", "royalblue2",
-                "red3", "red1", 
+                "red4", "red1", 
                 # "coral", "coral3",
                 # "deeppink4", "deeppink1",
                 #
-                "chartreuse1", "chartreuse3",
-                "navy"
+                "chartreuse1", "chartreuse4"
 )
 # lrns.ids = c("knn1nderiv0_eucl", "fdaclassif.classiKernel.tuned", 
 #              "knn1nderiv0_dtw", 
@@ -49,27 +49,28 @@ p.dots = plotBMRSummary(bmr, trafo = "rank", pretty.names = TRUE,
   scale_color_manual(values = lrns.colors, 
                      limits = getBMRLearnerShortNames(bmr)[order.lrns],
                      name = "")  +
-  xlab("rank of Brier score") +
+  xlab("Rank of Brier score") +
   mytheme +
   theme(legend.position = "bottom",
         plot.margin = unit(c(1, 5, 0.5, 0.5), "lines"))
 p.dots
 
-ggsave(paste0("Grafiken/benchmark/", name, "_dots.pdf"), p.dots, 
+ggsave(paste0("Plots/benchmark/", name, "_dots.pdf"), p.dots, 
        width = 13, height = 20)
 
 p.bars = plotBMRRanksAsBarChart(bmr, pretty.names = TRUE,
                                 order.lrns = getBMRLearnerIds(bmr)[order.lrns]) + 
   scale_fill_manual(values = lrns.colors, 
                     limits = getBMRLearnerShortNames(bmr)[order.lrns], 
-                    name = "model") +
+                    name = "Model") +
   scale_x_discrete(breaks = 1:17, 
                    labels = c(1, "", 3, "", 5, "", 7, "", 9, "", 
                               11, "", 13, "", 15, "", 17)) +
-  ylab("count") +
+  ylab("Count") +
+  xlab("Rank") +
   mytheme
 p.bars
-ggsave(paste0("Grafiken/benchmark/", name, "_bars.pdf"), p.bars, 
+ggsave(paste0("Plots/benchmark/", name, "_bars.pdf"), p.bars, 
        width = 13, height = 7)
 
 #################################################################
@@ -92,7 +93,7 @@ p.box = plotBMRBoxplots(bmr, measure = multiclass.brier, pretty.names = TRUE,
         axis.text.x = element_text(angle = -60, hjust = 0),
         legend.position = "bottom")
 p.box
-ggsave(paste0("Grafiken/benchmark/", name, "_boxplot.pdf"), p.box, 
+ggsave(paste0("Plots/benchmark/", name, "_boxplot.pdf"), p.box, 
        width = 13, height = 55, limitsize = FALSE)
 
 # Friedman Test
@@ -111,7 +112,7 @@ p.cd = plotCritDifferences(g, pretty.names = TRUE) +
   theme(text = element_text(size = 10),
         plot.margin = unit(c(2, 1, 0.5, 0.5), "lines"))
 p.cd
-ggsave(paste0("Grafiken/benchmark/", name, "_cd.pdf"), p.cd, 
+ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd, 
        width = 0.8*13, height = 0.8*9)
 
 # # create critical difference diagrams for useful subsets of the learners
@@ -148,7 +149,7 @@ ggsave(paste0("Grafiken/benchmark/", name, "_cd.pdf"), p.cd,
 # #      plot.margin = unit(c(2, 1, 0.5, 0.5), "lines"))
 # p.cd_ens_better
 # 
-# ggsave(paste0("Grafiken/benchmark/", name, "_ensemble_better_cd.pdf"),
+# ggsave(paste0("Plots/benchmark/", name, "_ensemble_better_cd.pdf"),
 #        plot = p.cd_ens_better, width = 0.8*13, height = 0.8*9)
 # 
 # 
@@ -171,7 +172,7 @@ ggsave(paste0("Grafiken/benchmark/", name, "_cd.pdf"), p.cd,
 # #       plot.margin = unit(c(2, 1, 0.5, 0.5), "lines"))
 # p.cd_rf_better
 # 
-# ggsave(paste0("Grafiken/benchmark/", name, "_rf_better_cd.pdf"),
+# ggsave(paste0("Plots/benchmark/", name, "_rf_better_cd.pdf"),
 #        plot = p.cd_rf_better, width = 0.8*13, height = 0.8*9)
 # 
 # ######################
@@ -193,6 +194,6 @@ ggsave(paste0("Grafiken/benchmark/", name, "_cd.pdf"), p.cd,
 #                      name = "learner")
 # p.cd_ref_mod
 # 
-# ggsave(paste0("Grafiken/benchmark/", name, "_ref_mod_cd.pdf"),
+# ggsave(paste0("Plots/benchmark/", name, "_ref_mod_cd.pdf"),
 #        plot = p.cd_ref_mod, width = 0.8*13, height = 0.8*9)
 # 

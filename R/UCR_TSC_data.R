@@ -69,19 +69,20 @@ name = nobs = obslen = rep(NA, length(tsks))
 for (i in 1:length(tsks)) {
   name[i] = getTaskId(tsks[[i]])
   nobs[i] = getTaskSize(tsks[[i]])
-  obslen[i] = getTaskNFeats(tsks[[i]])
+  obslen[i] =  ncol(getTaskData(tsks[[i]]))
 }
 df = data.frame(name, nobs, obslen, nobs*obslen)
 # hist(df$nobs...obslen, breaks = 100)
 # summary(df$nobs...obslen)
 # quantile(df$nobs...obslen, 0.4)
-# df_red = df[df$nobs...obslen <= 100,]
+# df_red = df[df$nobs...obslen <= 50000,]
 # nrow(df_red)
 
 tsk_names = lapply(tsks, getTaskId)
-tsk_selection = tsk_names %in% c("FiftyWords")
 small_tasks = sapply(1:length(tsks), function(i) (any(table(getTaskTargets(tsks[[i]])) < 10)))
 # # Benchmark_results/2017-
-# go up to 10000 later
-tsks = tsks[df$nobs...obslen <= 5000 & !small_tasks]
+# go up to 100000 later
+tsks = tsks[df$nobs...obslen <= 50000 & !small_tasks]
 
+# delete unneeded large objects
+rm(data_list)
