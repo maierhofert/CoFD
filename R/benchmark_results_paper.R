@@ -115,6 +115,7 @@ p.cd
 ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd, 
        width = 0.8*13, height = 0.8*9)
 
+
 # # create critical difference diagrams for useful subsets of the learners
 # # critical difference diagram
 # learner.ids = c("knn1nderiv0_eucl",
