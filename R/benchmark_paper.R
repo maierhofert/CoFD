@@ -30,7 +30,7 @@ if (on_server) {
   parallelStartSocket(cpus = 10, level = "mlr.resample") # level = "mlr.resample"
   parallelLibrary("dtw", level = "mlr.resample")
 } else {
-  parallelStartSocket(cpus = 4, level = "mlr.resample")
+  parallelStartSocket(cpus = 2, level = "mlr.resample")
   parallelLibrary("dtw", level = "mlr.resample")
 }
 

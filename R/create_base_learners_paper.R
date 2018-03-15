@@ -313,4 +313,3 @@ knnOptNderivOptSemimetOpt$short.name = "Opt base learner"
 
 lrns = c(reference_lrns, list(knnOptNderivOptSemimetOpt), ensemble_lrns)
 
-

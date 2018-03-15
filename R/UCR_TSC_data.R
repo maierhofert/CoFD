@@ -82,7 +82,7 @@ tsk_names = lapply(tsks, getTaskId)
 small_tasks = sapply(1:length(tsks), function(i) (any(table(getTaskTargets(tsks[[i]])) < 10)))
 # # Benchmark_results/2017-
 # go up to 100000 later
-tsks = tsks[df$nobs...obslen <= 50000 & !small_tasks]
-
+# tsks = tsks[df$nobs...obslen <= 50000 & !small_tasks]
+tsks = tsks[df$nobs...obslen <= 100000 & !small_tasks]
 # delete unneeded large objects
 rm(data_list)
