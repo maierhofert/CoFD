@@ -1,58 +1,82 @@
 ###
-learner = RFE.lrn
+learner = LCE.lrn
 task = task
 
 
 # create partial dependence plots for RFE
 
 ####
-# copy & paste from mlr
-# stackCV = function(learner, task) {
-td = getTaskDesc(task)
-type = ifelse(td$type == "regr", "regr",
-              ifelse(length(td$class.levels) == 2L, "classif", "multiclassif"))
+# copy & paste from maierhofert/mlr classiFunc StackedLearner.R
+# classif.bs.optimal = function(learner, task) {
 bls = learner$base.learners
-use.feat = learner$use.feat
-# cross-validate all base learners and get a prob vector for the whole dataset for each learner
 base.models = probs = vector("list", length(bls))
+
+# adjusted code from stackCV
 rin = makeResampleInstance(learner$resampling, task = task)
 for (i in seq_along(bls)) {
   bl = bls[[i]]
   r = resample(bl, task, rin, show.info = FALSE)
-  probs[[i]] = mlr:::getResponse(r$pred, full.matrix = FALSE)
+  probs[[i]] = mlr:::getResponse(r$pred, full.matrix = TRUE)
   # also fit all base models again on the complete original data set
   base.models[[i]] = train(bl, task)
 }
 names(probs) = names(bls)
+# probsOG = probs
+# probs = probsOG
 
-if (type == "regr" || type == "classif") {
-  probs = as.data.frame(probs)
-} else {
-  probs = as.data.frame(lapply(probs, function(X) X)) #X[, -ncol(X)]))
-}
+# convert from list to data frame
+probs = as.data.frame(probs)
 
-# add true target column IN CORRECT ORDER
-tn = getTaskTargetNames(task)
-test.inds = unlist(rin$test.inds)
-
-pred.train = as.list(probs[order(test.inds), , drop = FALSE])
-
-probs[[tn]] = getTaskTargets(task)[test.inds]
-
-# now fit the super learner for predicted_probs --> target
+# reorder data frame to original order
 probs = probs[order(test.inds), , drop = FALSE]
-# if (use.feat) {
-#   # add data with normal features IN CORRECT ORDER
-#   feat = getTaskData(task)#[test.inds, ]
-#   feat = feat[, !colnames(feat) %in% tn, drop = FALSE]
-#   pred.data = cbind(probs, feat)
-#   super.task = makeSuperLearnerTask(learner, data = pred.data, target = tn)
-# } else {
-super.task = mlr:::makeSuperLearnerTask(learner, data = probs, target = tn)
-# }
-super.model = train(learner$super.learner, super.task)
-# list(method = "stack.cv", base.models = base.models,
-#      super.model = super.model, pred.train = pred.train)
+
+# rename columns to be the same for across all classes
+nclasses = length(getTaskClassLevels(task))
+colnames(probs) = rep(names(bls), each = nclasses)
+
+# reorder data frame to be like P in Fuchs etal. (2015)
+probsList = list()
+for (i in 1:nclasses) {
+  probsList[[i]] = probs[(seq_along(colnames(probs)) - 1) %% nclasses == (i - 1)]
+}
+P = bind_rows(probsList)
+
+# convert to matrix
+P = as.matrix(P)
+
+# code the response
+z = as.vector(model.matrix( ~ . -1, data = data.frame(getTaskTargets(task))))
+
+# From Fuchs Online Appendix
+A = P * (-1)
+B = z * (-1)
+
+H = rep(0, length = ncol(A))
+G = diag(1, nrow = ncol(A))
+
+E = rep(1, ncol(A))
+F = 1
+
+####################################
+# taken from the limSolve::lsei function
+# the lsei function seemed to not be stable
+# the solve.QP seems to be more stable
+dvec = crossprod(A, B)
+Dmat = crossprod(A, A)
+diag(Dmat) = diag(Dmat) + 1e-08
+Amat = t(rbind(E, G))
+bvec = c(F, H)
+
+# E and F are onedimensional
+Neq = 1
+
+sol = quadprog::solve.QP(Dmat, dvec, Amat, bvec, meq = Neq)
+Cs = round(sol$solution, digits = 4)
+################################
+
+# return the weight vector Cs from the algorithm
+list(method = "classif.bs.optimal", base.models = base.models, super.model = NULL,
+     pred.train = probs, weights = Cs)
 # }
 
 
