@@ -7,6 +7,7 @@ task = task
 
 ####
 # copy & paste from maierhofert/mlr classiFunc StackedLearner.R
+# fixed major bug
 # classif.bs.optimal = function(learner, task) {
 bls = learner$base.learners
 base.models = probs = vector("list", length(bls))
@@ -21,8 +22,6 @@ for (i in seq_along(bls)) {
   base.models[[i]] = train(bl, task)
 }
 names(probs) = names(bls)
-# probsOG = probs
-# probs = probsOG
 
 # convert from list to data frame
 probs = as.data.frame(probs)
