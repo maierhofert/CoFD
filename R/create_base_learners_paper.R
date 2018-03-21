@@ -265,8 +265,8 @@ ensemble_lrns = list(LCE, LCE_noisy,
                      RFE, RFE_noisy)
 
 
-# # train learners
-# # This is not needed for benchmarking
+# # # train learners
+# # # This is not needed for benchmarking
 # mod1 = train(learner = LCE, task = tsks[[1]])
 # mod2 = train(learner = LCE, task = tsks[[2]])
 # fda.pred = predict(mod1, task = tsks[[1]])

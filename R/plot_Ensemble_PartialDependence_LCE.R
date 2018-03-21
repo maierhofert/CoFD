@@ -1,4 +1,5 @@
 ###
+source("R/plot_Ensemble.R")
 learner = LCE.lrn
 task = task
 
@@ -22,6 +23,12 @@ for (i in seq_along(bls)) {
   base.models[[i]] = train(bl, task)
 }
 names(probs) = names(bls)
+probsOG = probs
+
+# name of target column
+tn = getTaskTargetNames(task)
+# order of resampled observations
+test.inds = unlist(rin$test.inds)
 
 # convert from list to data frame
 probs = as.data.frame(probs)
@@ -71,6 +78,7 @@ Neq = 1
 
 sol = quadprog::solve.QP(Dmat, dvec, Amat, bvec, meq = Neq)
 Cs = round(sol$solution, digits = 4)
+names(Cs) = names(bls)
 ################################
 
 # return the weight vector Cs from the algorithm
@@ -82,44 +90,71 @@ list(method = "classif.bs.optimal", base.models = base.models, super.model = NUL
 
 ################################################################################
 # partial dependence
-name = "RFE"
+name = "LCE"
+
+P = P[1:40,]
 
 # create partial dependence data
-# L2 dtw
-pd_dat_L2_dtw = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                              features = c("L2", "dtw"), interaction = TRUE)
-plotPartialDependence(pd_dat_L2_dtw, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_L2_dtw.pdf"), width = 6, height = 5)
 
+# cols = c("L2", "dtw")
+# weights = Cs
+getPDdataLCE = function(P, weights, cols) {
+  # create data frame with unique combinations of al cols
+  uniqueList = list()
+  for (i in cols) {
+    uniqueList[[i]] = unique(P[,i])
+  }
+  ICE_data = expand.grid(uniqueList)
+  # add other (constant) columns
+  other_cols = colnames(P)[!colnames(P) %in% cols]
+  ICE_data[,other_cols] = colMeans(P[, other_cols])
+  ICE_data$ensemble = apply(ICE_data, 1, function(x) {
+    sum((x * weights)[colnames(P) %in% other_cols])
+  })
+  return(ICE_data)
+}
+# TODO fix bug in other_cols probability
+
+# partial depencee plot
+PDplot = function(this.pd_dat, this.cols) {
+  ggplot(this.pd_dat)  +
+    geom_tile(aes(x = eval(parse(text = this.cols[1])), 
+                  y = eval(parse(text = this.cols[2])),
+                  fill = ensemble)) +
+    scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
+                         high = "dodgerblue", low = "red") +
+    xlab(this.cols[1]) +
+    ylab(this.cols[2]) +
+    facet_null()
+}
+
+# L2 dtw
+this.cols = c("L2", "dtw")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
+ 
 # L2 random
-pd_dat_L2_random = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                                 features = c("L2", "random"), interaction = TRUE)
-plotPartialDependence(pd_dat_L2_random, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_L2_random.pdf"), width = 6, height = 5)
+this.cols = c("L2", "random")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
 
 # L2 globMax
-pd_dat_L2_globMax = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                                  features = c("L2", "globMax"), interaction = TRUE)
-plotPartialDependence(pd_dat_L2_globMax, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_L2_globMax.pdf"), width = 6, height = 5)
+this.cols = c("L2", "globMax")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
 
 # dtw random
-pd_dat_random_dtw = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                                  features = c("random", "dtw"), interaction = TRUE)
-plotPartialDependence(pd_dat_random_dtw, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_random_dtw.pdf"), width = 6, height = 5)
+this.cols = c("dtw", "random")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
 
 # dtw globMax
 pd_dat_dtw_globMax = generatePartialDependenceData(obj = super.model, input = super.task, 
