@@ -4,6 +4,10 @@ library("mlr")
 library("ggplot2")
 mytheme = theme_bw(20)
 
+# # tasks and resulting benchmark experiment
+# tsks = tsks[df$nobs...obslen <= 100000 & !small_tasks]
+# 2018-03-21bmr_paper.RDS
+
 # read in most current benchmark
 bmr = readRDS("Benchmark_results/2018-03-21bmr_paper.RDS")
 name = "bmr_paper"
