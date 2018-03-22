@@ -19,7 +19,7 @@ lrns.colors = c("grey20", "grey60",
                 # "orange1", "goldenrod", 
                 #
                 # "navy", "royalblue2",
-                "red4", "red1", 
+                "red1", "red4", 
                 # "coral", "coral3",
                 # "deeppink4", "deeppink1",
                 #
