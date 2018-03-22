@@ -3,73 +3,57 @@
 ################################################################################
 ### Section 4, usage through mlr-interface
 # Section 4.1 Replication of Basic Functionality
-# Chunk 1
-
-# install mlr package once
+# chunk 1
 # install.packages("mlr") # use the version on github if my pull request is not yet merged
 devtools::install_github("maierhofert/mlr", ref = "classiFunc")
-
-# load mlr package in every new R-session
 library("mlr")
 
-# create learners (= model description in mlr)
+# chunk 2
 lrn.nn = makeLearner(cl = "classif.classiFunc.knn", 
                      predict.type = "prob")
 lrn.ker = makeLearner(cl = "classif.classiFunc.kernel", 
                       h = 10,
                       predict.type = "prob")
 
-
-# Chunk 2
-
-# load BeetleFly example data
+# chunk 3
 data("BeetleFly", package = "classiFunc")
 BeetleFly = BeetleFly[,-ncol(BeetleFly)]
-# # export BeetleFly data to mlr data format
 fdata = makeFunctionalData(BeetleFly, exclude.cols = c("target"))
-
-# create mlr task from data
 task = makeClassifTask(data = fdata, target = "target")
 
-# use same train/test split as in  Section 3
-set.seed(1)
-train.rows = sample(c(TRUE, FALSE), size = getTaskSize(task), 
-                    replace = TRUE, prob = c(0.5, 0.5))
-
-# create separate tasks for train/test split
+# chunk 4
 task.train = subsetTask(task, subset = train.rows)
 task.test = subsetTask(task, subset = !train.rows)
 
 
-# chunk 3
-
-# create models (train learners on training data)
+# chunk 5
 mod.nn = train(learner = lrn.nn, task = task.train)
 mod.ker = train(learner = lrn.ker, task = task.train)
 
-
-# chunk 4
-
-# use trained models to predict test data
+# chunk 6
 pred.nn = predict(mod.nn, task = task.test)
 pred.ker = predict(mod.ker, task = task.test)
 
 
-# chunk 5
+# chunk 7
+measureMulticlassBrier(getPredictionProbabilities(pred.nn, c("1", "2")),
+                      getTaskTargets(task.test))
 
-# confusion matrix for nn estimator
-table(pred = getPredictionResponse(pred.nn),
-      true = getTaskTargets(task.test))
-# confusion matrix for kernel estimator
-table(pred = getPredictionResponse(pred.ker), 
-      true = getTaskTargets(task.test))
+measureMulticlassBrier(getPredictionProbabilities(pred.ker, c("1", "2")),
+                       getTaskTargets(task.test))
 
-# # get predicted probabilities
-# getPredictionProbabilities(pred.ker)
+
+# # confusion matrix for nn estimator
+# table(pred = getPredictionResponse(pred.nn),
+#       true = getTaskTargets(task.test))
+# # confusion matrix for kernel estimator
+# table(pred = getPredictionResponse(pred.ker), 
+#       true = getTaskTargets(task.test))
+
 
 ################################################################################
 # Section 4.2 Automated Hyperparameter Tuning
-# Chunk 1
+# chunk 1
 
 # create classiKernel learner for classification of functional data
 lrn.ker = makeLearner("classif.classiFunc.kernel", 
@@ -99,7 +83,7 @@ lrn.bandwidth.tuned = makeTuneWrapper(learner = lrn.ker,
 m.kern.tuned = train(lrn.bandwidth.tuned, task.train)
 
 
-# Chunk 2
+# chunk 2
 
 # predict test data set
 pred.kern.tuned = predict(m.kern.tuned, task = task.test)
@@ -107,7 +91,7 @@ pred.kern.tuned = predict(m.kern.tuned, task = task.test)
 table(pred = getPredictionResponse(pred.kern.tuned), 
       true = getTaskTargets(task.test))
 
-# # Chunk 3
+# # chunk 3
 # # get predicted probabilities
 # getPredictionProbabilities(pred.kern.tuned)
 
@@ -116,7 +100,7 @@ table(pred = getPredictionResponse(pred.kern.tuned),
 # Section 4.3 Creating Customized Ensembles
 
 
-# Chunk 1
+# chunk 1
 
 # create base learners
 b.lrn1 = makeLearner("classif.classiFunc.knn",
@@ -131,16 +115,16 @@ b.lrn2 = makeLearner("classif.classiFunc.knn",
                      predict.type = "prob")
 
 b.lrn3 = makeLearner("classif.classiFunc.knn", 
-                      id = "globMax",
-                      par.vals = list(metric = "globMax"), 
-                      predict.type = "prob")
+                     id = "globMax",
+                     par.vals = list(metric = "globMax"), 
+                     predict.type = "prob")
 
 b.lrn4 = makeLearner("classif.classiFunc.knn", 
                      id = "random",
                      par.vals = list(metric = "custom.metric", 
                                      custom.metric = function(x, y) runif(1)), 
                      predict.type = "prob")
-# Chunk 2
+# chunk 2
 
 # create LCE
 # use 10 fold CV (default is leave-one-out-CV) for faster run time.
@@ -159,7 +143,7 @@ RFE.lrn = makeStackedLearner(
   super.learner = "classif.randomForest")
 
 
-# Chunk 3
+# chunk 3
 
 # train models on the training data
 set.seed(1)
@@ -167,7 +151,7 @@ LCE.m = train(LCE.lrn, task = task.train)
 RFE.m = train(RFE.lrn, task = task.train)
 
 
-# Chunk 4
+# chunk 4
 
 # predict test data set
 LCE.pred = predict(LCE.m, task = task.test)

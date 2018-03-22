@@ -13,43 +13,34 @@ classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1,
              nderiv = 0L, ...)
 
 # Chunk 2
-
-# install classiFunc package once
 # install.packages("classiFunc") # after new CRAN publication
 devtools::install_github("maierhofert/classiFunc", ref = "devel")
-
-# load package in every new R-session
 library("classiFunc")
 
-# load the example data
+# Chunk 3
 data("BeetleFly")
-
-# random train/test split
 set.seed(1)
 train.rows = sample(c(TRUE, FALSE), size = nrow(BeetleFly), 
                     replace = TRUE, prob = c(0.5, 0.5))
 
-# create nearest neighbor estimator with default values
+# Chunk 4
 nn.mod = classiKnn(classes = BeetleFly[train.rows, "target"], 
                    fdata = BeetleFly[train.rows, 1:512])
 
-# create kernel estimator with manually set bandwidth
 ker.mod = classiKernel(classes = BeetleFly[train.rows, "target"], 
                        fdata = BeetleFly[train.rows, 1:512],
                        h = 10)
 
-# Chunk 3
+# Chunk 5
+pred.nn = predict(nn.mod, newdata = BeetleFly[!train.rows, 1:512],
+                  predict.type = "prob")
+pred.ker = predict(ker.mod, newdata = BeetleFly[!train.rows, 1:512],
+                   predict.type = "prob")
 
-# predict nearest neighbor estimators
-pred.nn = predict(nn.mod, newdata = BeetleFly[!train.rows, 1:512])
-pred.ker = predict(ker.mod, newdata = BeetleFly[!train.rows, 1:512])
-
-# Chunk 4
-
-# confusion matrix for nn estimator
-table(pred = pred.nn, true = BeetleFly[!train.rows, "target"])
-# confusion matrix for kernel estimator
-table(pred = pred.ker, true = BeetleFly[!train.rows, "target"])
+# Chunk 6
+2 * mean((pred.nn[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
+2 * mean((pred.ker[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
 
 ################################################################################
-
+table(pred = pred.nn, true = BeetleFly[!train.rows, "target"])
+table(pred = pred.ker, true = BeetleFly[!train.rows, "target"])
