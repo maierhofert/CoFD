@@ -5,7 +5,7 @@ library("ggplot2")
 mytheme = theme_bw(20)
 
 # read in most current benchmark
-bmr = readRDS("Benchmark_results/2018-03-15bmr_paper.RDS")
+bmr = readRDS("Benchmark_results/2018-03-21bmr_paper.RDS")
 name = "bmr_paper"
 
 # pretty labels for learners
@@ -114,6 +114,18 @@ p.cd = plotCritDifferences(g, pretty.names = TRUE) +
 p.cd
 ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd, 
        width = 0.8*13, height = 0.8*9)
+
+# # new helper function to extract bmr objects containing only a subset of the learners
+# subsetBMR = function(bmr, learner.ids) {
+#   bmr_new = bmr
+#   bmr_new$results = mlr:::getBMRObjects(bmr, learner.ids = learner.ids,
+#                                         fun = function(x) {x})
+#   bmr_new$learners = bmr$learners[learner.ids]
+#   return(bmr_new)
+# }
+# bmr_subs = subsetBMR(bmr, c("knn1nderiv0_eucl", "classif.classiFunc.kernel.tuned",
+#                             "knn1nderiv0_dtw", "knnOptNderivOptSemimetOpt.tuned",
+#                             "LCE", "LCE_noisy", "RFE", "RFE_noisy"))
 
 
 # # create critical difference diagrams for useful subsets of the learners
