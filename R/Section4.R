@@ -12,7 +12,7 @@ library("mlr")
 lrn.nn = makeLearner(cl = "classif.classiFunc.knn", 
                      predict.type = "prob")
 lrn.ker = makeLearner(cl = "classif.classiFunc.kernel", 
-                      h = 10,
+                      h = 15,
                       predict.type = "prob")
 
 # chunk 3
@@ -54,46 +54,26 @@ measureMulticlassBrier(getPredictionProbabilities(pred.ker, c("1", "2")),
 ################################################################################
 # Section 4.2 Automated Hyperparameter Tuning
 # chunk 1
-
-# create classiKernel learner for classification of functional data
-lrn.ker = makeLearner("classif.classiFunc.kernel", 
-                      predict.type = "prob")
-
-# create parameter set
 parSet.h = makeParamSet(
   makeNumericParam(id = "h", lower = 0, upper = 2, 
                    trafo = function(x) 10 ^ x))
 
-# define grid search algorithm for hyper parameters
-# use higher grid resolution in application
-ctrl = makeTuneControlGrid(resolution = 10L)
-
-# use 5 fold CV for hyper parameter tuning
-rdesc = makeResampleDesc("CV", iters = 5)
-
-# create tuned learner
-set.seed(1)
-lrn.bandwidth.tuned = makeTuneWrapper(learner = lrn.ker, 
-                                      resampling = rdesc,
-                                      measures = brier,
-                                      par.set = parSet.h,
-                                      control = ctrl)
-
-# train model on training data task
-m.kern.tuned = train(lrn.bandwidth.tuned, task.train)
-
-
 # chunk 2
+set.seed(1)
+lrn.tuned = makeTuneWrapper(learner = lrn.ker,
+                            resampling = makeResampleDesc("CV", iters = 5),
+                            measures = brier,
+                            par.set = parSet.h,
+                            control = makeTuneControlGrid())
 
-# predict test data set
-pred.kern.tuned = predict(m.kern.tuned, task = task.test)
-# confusion matrix for kernel estimator
-table(pred = getPredictionResponse(pred.kern.tuned), 
-      true = getTaskTargets(task.test))
+# chunk 3
+m.tuned = train(lrn.tuned, task.train)
 
-# # chunk 3
-# # get predicted probabilities
-# getPredictionProbabilities(pred.kern.tuned)
+# chunk 4
+pred.tuned = predict(m.tuned, task = task.test)
+measureMulticlassBrier(getPredictionProbabilities(pred.tuned, c("1", "2")),
+                       getTaskTargets(task.test))
+
 
 
 ################################################################################
@@ -101,8 +81,6 @@ table(pred = getPredictionResponse(pred.kern.tuned),
 
 
 # chunk 1
-
-# create base learners
 b.lrn1 = makeLearner("classif.classiFunc.knn",
                      id = "L2",
                      par.vals = list(metric = "L2"), 
@@ -124,6 +102,8 @@ b.lrn4 = makeLearner("classif.classiFunc.knn",
                      par.vals = list(metric = "custom.metric", 
                                      custom.metric = function(x, y) runif(1)), 
                      predict.type = "prob")
+
+# TODO continue here 3/22
 # chunk 2
 
 # create LCE

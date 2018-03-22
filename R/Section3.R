@@ -5,11 +5,11 @@
 
 # Chunk 1
 
-classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L, 
+classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
           metric = "L2", nderiv = 0L, ...)
 
-classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1, 
-             metric = "L2", ker = "Ker.norm", 
+classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1,
+             metric = "L2", ker = "Ker.norm",
              nderiv = 0L, ...)
 
 # Chunk 2
@@ -41,6 +41,3 @@ pred.ker = predict(ker.mod, newdata = BeetleFly[!train.rows, 1:512],
 2 * mean((pred.nn[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
 2 * mean((pred.ker[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
 
-################################################################################
-table(pred = pred.nn, true = BeetleFly[!train.rows, "target"])
-table(pred = pred.ker, true = BeetleFly[!train.rows, "target"])
