@@ -13,6 +13,7 @@ task = task
 bls = learner$base.learners
 base.models = probs = vector("list", length(bls))
 
+set.seed(1)
 # adjusted code from stackCV
 rin = makeResampleInstance(learner$resampling, task = task)
 for (i in seq_along(bls)) {
@@ -24,6 +25,7 @@ for (i in seq_along(bls)) {
 }
 names(probs) = names(bls)
 probsOG = probs
+# probs = probsOG
 
 # name of target column
 tn = getTaskTargetNames(task)
@@ -45,7 +47,8 @@ probsList = list()
 for (i in 1:nclasses) {
   probsList[[i]] = probs[(seq_along(colnames(probs)) - 1) %% nclasses == (i - 1)]
 }
-P = bind_rows(probsList)
+# convert list into a data frame
+P <- do.call("rbind", probsList)
 
 # convert to matrix
 P = as.matrix(P)
@@ -107,9 +110,10 @@ getPDdataLCE = function(P, weights, cols) {
   ICE_data = expand.grid(uniqueList)
   # add other (constant) columns
   other_cols = colnames(P)[!colnames(P) %in% cols]
-  ICE_data[,other_cols] = colMeans(P[, other_cols])
+  ICE_data[,other_cols] = colMeans(P[, other_cols]) %>%
+    rep(each = nrow(ICE_data))
   ICE_data$ensemble = apply(ICE_data, 1, function(x) {
-    sum((x * weights)[colnames(P) %in% other_cols])
+    sum(x[names(weights)] * weights)
   })
   return(ICE_data)
 }
@@ -128,6 +132,8 @@ PDplot = function(this.pd_dat, this.cols) {
     facet_null()
 }
 
+# ##############################################################################
+# plot partial dependence plots
 # L2 dtw
 this.cols = c("L2", "dtw")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
@@ -157,20 +163,16 @@ ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "
        width = 6, height = 5)
 
 # dtw globMax
-pd_dat_dtw_globMax = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                                   features = c("dtw", "globMax"), interaction = TRUE)
-plotPartialDependence(pd_dat_dtw_globMax, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_dtw_globMax.pdf"), width = 6, height = 5)
+this.cols = c("dtw", "globMax")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
 
 # random globMax
-pd_dat_random_globMax = generatePartialDependenceData(obj = super.model, input = super.task, 
-                                                      features = c("random", "globMax"), interaction = TRUE)
-plotPartialDependence(pd_dat_random_globMax, geom = "tile") +
-  scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
-                       high = "dodgerblue", low = "red") +
-  facet_null()
-ggsave(paste0("Plots/PD_", name, "_ens_random_globMax.pdf"), width = 6, height = 5)
+this.cols = c("globMax", "random")
+this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
+PDplot(this.pd_dat, this.cols)
+ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
+       width = 6, height = 5)
 
