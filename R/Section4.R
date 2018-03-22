@@ -93,18 +93,14 @@ b.lrn4 = makeLearner("classif.classiFunc.knn",
                                      custom.metric = function(x, y) runif(1)), 
                      predict.type = "prob")
 
-# TODO continue here 3/22
 # chunk 2
 
-# create LCE
-# use 10 fold CV (default is leave-one-out-CV) for faster run time.
 LCE.lrn = makeStackedLearner(
   base.learners = list(b.lrn1, b.lrn2, b.lrn3, b.lrn4), 
   predict.type = "prob", 
   resampling = makeResampleDesc("CV", iters = 10L),
   method = "classif.bs.optimal")
 
-# create RFE
 RFE.lrn = makeStackedLearner(
   base.learners = list(b.lrn1, b.lrn2, b.lrn3, b.lrn4), 
   predict.type = "prob",
@@ -114,47 +110,16 @@ RFE.lrn = makeStackedLearner(
 
 
 # chunk 3
-
-# train models on the training data
 set.seed(1)
 LCE.m = train(LCE.lrn, task = task.train)
 RFE.m = train(RFE.lrn, task = task.train)
 
 
 # chunk 4
-
-# predict test data set
 LCE.pred = predict(LCE.m, task = task.test)
 RFE.pred = predict(RFE.m, task = task.test)
 
-# confusion matrix for LCE
-table(pred = getPredictionResponse(LCE.pred), 
-      true = getTaskTargets(task.test))
-# confusion matrix for RFE
-table(pred = getPredictionResponse(RFE.pred), 
-      true = getTaskTargets(task.test))
-
-# ##############################
-
-
-# # plots
-# library("randomForest")
-# rf = RFE.m$learner.model$super.model$learner.model
-# varImpPlot(rf)
-# 
-# 
-# library("ggplot2")
-# weight = LCE.m$learner.model$weights
-# base.learners = BBmisc::extractSubList(LCE.m$learner.model$base.models, "learner",
-#                                        simplify = FALSE)
-# base.learners.id = sapply(base.learners, getLearnerId)
-# plot.data = data.frame(id = base.learners.id, weight = weight)
-# # barplot with the nnensemble weights
-# weight.plot <- ggplot(data = plot.data, aes(x = id, y = weight)) +
-#   geom_bar(stat = "identity") +
-#   xlab("base model") +
-#   theme(axis.text.x = element_text(angle = 90, 
-#                                    hjust = 0.95,
-#                                    vjust = 0.5))
-# weight.plot
-
+measureMulticlassBrier(getPredictionProbabilities(LCE.pred, c("1", "2")),
+                       getTaskTargets(task.test))
+measureMulticlassBrier(getPredictionProbabilities(RFE.pred, c("1", "2")),
+                       getTaskTargets(task.test))
