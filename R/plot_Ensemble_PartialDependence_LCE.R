@@ -93,7 +93,7 @@ list(method = "classif.bs.optimal", base.models = base.models, super.model = NUL
 
 ################################################################################
 # partial dependence
-name = "LCE"
+
 
 P = P[1:40,]
 
@@ -134,45 +134,46 @@ PDplot = function(this.pd_dat, this.cols) {
 
 # ##############################################################################
 # plot partial dependence plots
+name = "LCE"
 # L2 dtw
 this.cols = c("L2", "dtw")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
  
 # L2 random
 this.cols = c("L2", "random")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
 
 # L2 globMax
 this.cols = c("L2", "globMax")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
 
 # dtw random
 this.cols = c("dtw", "random")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
 
 # dtw globMax
 this.cols = c("dtw", "globMax")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
 
 # random globMax
 this.cols = c("globMax", "random")
 this.pd_dat = getPDdataLCE(P = P, weights = Cs, cols = this.cols)
 PDplot(this.pd_dat, this.cols)
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_", this.cols[1], "_", this.cols[2], ".pdf"), 
-       width = 6, height = 5)
+       width = 5, height = 4)
 

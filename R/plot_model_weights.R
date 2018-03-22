@@ -22,8 +22,6 @@ plot.data = data.frame(id = names(bls), weight = Cs)
 # barplot with the nnensemble weights
 weight.plot <- ggplot(data = plot.data, aes(x = id, y = weight)) +
   geom_bar(stat = "identity") +
-  scale_x_discrete(breaks = base.learners.id,
-                   labels = base.learner.labels) +
   xlab("base model") +
   mytheme +
   theme(axis.text.x = element_text(angle = 90, 
@@ -31,10 +29,8 @@ weight.plot <- ggplot(data = plot.data, aes(x = id, y = weight)) +
                                    vjust = 0.5))
 weight.plot
 ggsave(paste0("Plots/weightplot_lce.pdf"), weight.plot, 
-       width = 12, height = 10)
+       width = 7, height = 6)
 
-
-source("R/plot_Ensemble_PartialDependence_RFE.R")
 
 # generate data for the rf_ensemble plot
 library("randomForest")
@@ -48,8 +44,6 @@ plot.data = data.frame(id = rownames(feat_imp), var_imp = as.vector(feat_imp))
 # barplot with the nnensemble weights
 weight.plot <- ggplot(data = plot.data, aes(x = id, y = var_imp)) +
   geom_bar(stat = "identity") +
-  scale_x_discrete(breaks = base.learners.id,
-                   labels = base.learner.labels) +
   xlab("base model") +
   ylab("variable importance") +
   mytheme +
@@ -58,4 +52,4 @@ weight.plot <- ggplot(data = plot.data, aes(x = id, y = var_imp)) +
                                    vjust = 0.5))
 weight.plot
 ggsave(paste0("Plots/weightplot_rfe.pdf"), weight.plot, 
-       width = 12, height = 10)
+       width = 7, height = 6)
