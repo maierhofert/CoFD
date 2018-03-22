@@ -29,7 +29,7 @@ nn.mod = classiKnn(classes = BeetleFly[train.rows, "target"],
 
 ker.mod = classiKernel(classes = BeetleFly[train.rows, "target"], 
                        fdata = BeetleFly[train.rows, 1:512],
-                       h = 10)
+                       h = 15)
 
 # Chunk 5
 pred.nn = predict(nn.mod, newdata = BeetleFly[!train.rows, 1:512],
@@ -38,6 +38,6 @@ pred.ker = predict(ker.mod, newdata = BeetleFly[!train.rows, 1:512],
                    predict.type = "prob")
 
 # Chunk 6
-2 * mean((pred.nn[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
-2 * mean((pred.ker[,1] - as.numeric(BeetleFly[!train.rows, "target"] == "1")) ^ 2)
+2 * mean((pred.nn[,1] - (BeetleFly[!train.rows, "target"] == "1")) ^ 2)
+2 * mean((pred.ker[,1] - (BeetleFly[!train.rows, "target"] == "1")) ^ 2)
 

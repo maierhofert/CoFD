@@ -37,26 +37,18 @@ pred.ker = predict(mod.ker, task = task.test)
 
 # chunk 7
 measureMulticlassBrier(getPredictionProbabilities(pred.nn, c("1", "2")),
-                      getTaskTargets(task.test))
+                       getTaskTargets(task.test))
 
 measureMulticlassBrier(getPredictionProbabilities(pred.ker, c("1", "2")),
                        getTaskTargets(task.test))
 
 
-# # confusion matrix for nn estimator
-# table(pred = getPredictionResponse(pred.nn),
-#       true = getTaskTargets(task.test))
-# # confusion matrix for kernel estimator
-# table(pred = getPredictionResponse(pred.ker), 
-#       true = getTaskTargets(task.test))
-
-
 ################################################################################
 # Section 4.2 Automated Hyperparameter Tuning
 # chunk 1
-parSet.h = makeParamSet(
-  makeNumericParam(id = "h", lower = 0, upper = 2, 
-                   trafo = function(x) 10 ^ x))
+par.h = makeNumericParam(id = "h", lower = 0, upper = 2, 
+                         trafo = function(x) 10 ^ x)
+parSet.h = makeParamSet(par.h)
 
 # chunk 2
 set.seed(1)
@@ -75,10 +67,8 @@ measureMulticlassBrier(getPredictionProbabilities(pred.tuned, c("1", "2")),
                        getTaskTargets(task.test))
 
 
-
 ################################################################################
 # Section 4.3 Creating Customized Ensembles
-
 
 # chunk 1
 b.lrn1 = makeLearner("classif.classiFunc.knn",
@@ -145,42 +135,26 @@ table(pred = getPredictionResponse(RFE.pred),
       true = getTaskTargets(task.test))
 
 # ##############################
-# # miscellaneous
-# # compute mean misclassification error (lower better)
-# measureMMCE(getTaskTargets(task.test), getPredictionResponse(LCE.pred))
-# measureMMCE(getTaskTargets(task.test), getPredictionResponse(RFE.pred))
+
+
+# # plots
+# library("randomForest")
+# rf = RFE.m$learner.model$super.model$learner.model
+# varImpPlot(rf)
 # 
-# # compute accuracy (higher better)
-# measureACC(getTaskTargets(task.test), getPredictionResponse(LCE.pred))
-# measureACC(getTaskTargets(task.test), getPredictionResponse(RFE.pred))
 # 
-# # compute brier score (lower better)
-# measureBrier(getPredictionProbabilities(LCE.pred),
-#              getTaskTargets(task.test), negative = "0", positive = "1")
-# measureBrier(getPredictionProbabilities(RFE.pred),
-#              getTaskTargets(task.test), negative = "0", positive = "1")
-# # getPredictionProbabilities(LCE.pred)
-# # getPredictionProbabilities(RFE.pred)
-
-
-# plots
-library("randomForest")
-rf = RFE.m$learner.model$super.model$learner.model
-varImpPlot(rf)
-
-
-library("ggplot2")
-weight = LCE.m$learner.model$weights
-base.learners = BBmisc::extractSubList(LCE.m$learner.model$base.models, "learner",
-                                       simplify = FALSE)
-base.learners.id = sapply(base.learners, getLearnerId)
-plot.data = data.frame(id = base.learners.id, weight = weight)
-# barplot with the nnensemble weights
-weight.plot <- ggplot(data = plot.data, aes(x = id, y = weight)) +
-  geom_bar(stat = "identity") +
-  xlab("base model") +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   hjust = 0.95,
-                                   vjust = 0.5))
-weight.plot
+# library("ggplot2")
+# weight = LCE.m$learner.model$weights
+# base.learners = BBmisc::extractSubList(LCE.m$learner.model$base.models, "learner",
+#                                        simplify = FALSE)
+# base.learners.id = sapply(base.learners, getLearnerId)
+# plot.data = data.frame(id = base.learners.id, weight = weight)
+# # barplot with the nnensemble weights
+# weight.plot <- ggplot(data = plot.data, aes(x = id, y = weight)) +
+#   geom_bar(stat = "identity") +
+#   xlab("base model") +
+#   theme(axis.text.x = element_text(angle = 90, 
+#                                    hjust = 0.95,
+#                                    vjust = 0.5))
+# weight.plot
 
