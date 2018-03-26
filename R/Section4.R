@@ -75,18 +75,15 @@ b.lrn1 = makeLearner("classif.classiFunc.knn",
                      id = "L2",
                      par.vals = list(metric = "L2"), 
                      predict.type = "prob")
-
 library("dtw")
 b.lrn2 = makeLearner("classif.classiFunc.knn", 
                      id = "dtw",
                      par.vals = list(metric = "dtw"), 
                      predict.type = "prob")
-
 b.lrn3 = makeLearner("classif.classiFunc.knn", 
                      id = "globMax",
                      par.vals = list(metric = "globMax"), 
                      predict.type = "prob")
-
 b.lrn4 = makeLearner("classif.classiFunc.knn", 
                      id = "random",
                      par.vals = list(metric = "custom.metric", 
