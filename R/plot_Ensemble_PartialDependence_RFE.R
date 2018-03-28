@@ -71,6 +71,8 @@ pd_dat_L2_dtw = generatePartialDependenceData(obj = super.model, input = super.t
 plotPartialDependence(pd_dat_L2_dtw, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_L2_dtw.pdf"), 
        width = 5, height = 4)
@@ -81,6 +83,8 @@ pd_dat_L2_random = generatePartialDependenceData(obj = super.model, input = supe
 plotPartialDependence(pd_dat_L2_random, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_L2_random.pdf"), 
        width = 5, height = 4)
@@ -91,6 +95,8 @@ pd_dat_L2_globMax = generatePartialDependenceData(obj = super.model, input = sup
 plotPartialDependence(pd_dat_L2_globMax, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_L2_globMax.pdf"), 
        width = 5, height = 4)
@@ -101,6 +107,8 @@ pd_dat_random_dtw = generatePartialDependenceData(obj = super.model, input = sup
 plotPartialDependence(pd_dat_random_dtw, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_dtw_random.pdf"), 
        width = 5, height = 4)
@@ -111,6 +119,8 @@ pd_dat_dtw_globMax = generatePartialDependenceData(obj = super.model, input = su
 plotPartialDependence(pd_dat_dtw_globMax, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_dtw_globMax.pdf"), 
        width = 5, height = 4)
@@ -121,6 +131,8 @@ pd_dat_random_globMax = generatePartialDependenceData(obj = super.model, input =
 plotPartialDependence(pd_dat_random_globMax, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_random_globMax.pdf"), 
        width = 5, height = 4)

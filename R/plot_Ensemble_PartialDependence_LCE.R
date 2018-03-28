@@ -127,6 +127,8 @@ PDplot = function(this.pd_dat, this.cols) {
                   fill = ensemble)) +
     scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                          high = "dodgerblue", low = "red") +
+    scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+    scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
     xlab(this.cols[1]) +
     ylab(this.cols[2]) +
     facet_null()

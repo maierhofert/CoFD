@@ -68,6 +68,8 @@ pd_dat_dtw_globMax = generatePartialDependenceData(obj = super.model, input = su
 plotPartialDependence(pd_dat_dtw_globMax, geom = "tile") +
   scale_fill_gradient2("P(Beetle)\n", midpoint = 0.5, limits = c(0, 1),
                        high = "dodgerblue", low = "red") +
+  scale_x_continuous(breaks = c(0, 0.33, 0.66, 1)) +
+  scale_y_continuous(breaks = c(0, 0.33, 0.66, 1)) +
   facet_null()
 ggsave(paste0("Plots/EnsemblePartialDepence/PD_", name, "_ens_dtw_globMax.pdf"), 
        width = 5, height = 4)
