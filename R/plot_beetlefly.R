@@ -1,16 +1,16 @@
 # extract contour of a 2d image and map it to th distance of the center
-source("http://bioconductor.org/biocLite.R")
+# source("http://bioconductor.org/biocLite.R")
 # biocLite()
 # biocLite("EBImage")
 
 library("EBImage")
 # x = readImage(system.file("images", "shapes.png", package = "EBImage"))
-x = readImage("Plots/beetlefly.png")
+x = readImage("Plots/BeetleFly/beetlefly.png")
 colorMode(x) = Grayscale
 
 # for one beetle
 b = x[1:58, 20:122, 1]
-writeImage(b, "Plots/Beetle1.JPG")
+writeImage(b, "Plots/BeetleFly/Beetle1.JPG")
 
 # invert colors
 b = abs(b - 1)
@@ -23,7 +23,7 @@ ocb[[1]] = ocb[[1]][c(TRUE, FALSE),]
 # plot outline
 fac = 9
 c.lab = 3
-jpeg("Plots/Beetle1_outline.JPG", width = 58*fac, height = 103*fac)
+jpeg("Plots/BeetleFly/Beetle1_outline.JPG", width = 58*fac, height = 103*fac)
 par(mar = c(5, 5, 4, 2) + 0.1)
 plot(ocb[[1]], type = 'l', 
      xlab = "x", ylab = "y",
@@ -47,13 +47,14 @@ dev.off()
 dist_to_center = proxy::dist(ocb$`1`, matrix(center, nrow = 1), by_rows = TRUE)
 
 # plot distance to outline
-jpeg("Plots/Beetle1_dist_outline.JPG", width = 2*58*fac, height = 103*fac)
+jpeg("Plots/BeetleFly/Beetle1_dist_outline.JPG", width = 2*58*fac, height = 103*fac)
 par(mar = c(5, 5, 4, 2) + 0.1)
 plot(dist_to_center, ylab = "Distance to center", xlab = "", 
      pch = 19, cex = 1.2, cex.lab = c.lab)
 points(0, dist_to_center[1], pch = "S", 
        # col = "darkgreen", 
        cex = 3)
+points(dist_to_center, type = "l")
 dev.off()
 
 
@@ -62,7 +63,7 @@ dev.off()
 
 # for one fly
 f = x[1:80, 122:234, 1]
-writeImage(f, "Plots/Fly1.JPG")
+writeImage(f, "Plots/BeetleFly/Fly1.JPG")
 
 # invert colors
 f = abs(f - 1)
@@ -79,7 +80,7 @@ oc[[1]] = oc[[1]][c(TRUE, FALSE),]
 
 # plot outline
 fac = 9
-jpeg("Plots/Fly1_outline.JPG", width = 80*fac, height = 113*fac)
+jpeg("Plots/BeetleFly/Fly1_outline.JPG", width = 80*fac, height = 113*fac)
 par(mar = c(5, 5, 4, 2) + 0.1)
 plot(oc[[1]], type = 'l', 
      xlab = "x", ylab = "y",
@@ -101,13 +102,14 @@ dev.off()
 dist_to_center = proxy::dist(oc$`1`, matrix(center, nrow = 1), by_rows = TRUE)
 
 # plot distance to outline
-jpeg("Plots/Fly1_dist_outline.JPG", width = 2 * 63*fac, height = 113*fac)
+jpeg("Plots/BeetleFly/Fly1_dist_outline.JPG", width = 2 * 63*fac, height = 113*fac)
 par(mar = c(5, 5, 4, 2) + 0.1)
 plot(dist_to_center, ylab = "Distance to center", xlab = "", 
      pch = 19, cex = 1.2, cex.lab = c.lab)
 points(0, dist_to_center[1], pch = "S", 
        # col = "darkgreen", 
        cex = 3)
+points(dist_to_center, type = "l")
 dev.off()
 
 
