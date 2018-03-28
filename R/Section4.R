@@ -12,7 +12,7 @@ library("mlr")
 lrn.nn = makeLearner(cl = "classif.classiFunc.knn", 
                      predict.type = "prob")
 lrn.ker = makeLearner(cl = "classif.classiFunc.kernel", 
-                      h = 15,
+                      h = 1,
                       predict.type = "prob")
 
 # chunk 3
@@ -73,21 +73,22 @@ measureMulticlassBrier(getPredictionProbabilities(pred.tuned, c("1", "2")),
 # chunk 1
 b.lrn1 = makeLearner("classif.classiFunc.knn",
                      id = "L2",
-                     par.vals = list(metric = "L2"), 
+                     par.vals = list(metric = "L2", knn = 3), 
                      predict.type = "prob")
 library("dtw")
 b.lrn2 = makeLearner("classif.classiFunc.knn", 
                      id = "dtw",
-                     par.vals = list(metric = "dtw"), 
+                     par.vals = list(metric = "dtw", knn = 3), 
                      predict.type = "prob")
 b.lrn3 = makeLearner("classif.classiFunc.knn", 
                      id = "globMax",
-                     par.vals = list(metric = "globMax"), 
+                     par.vals = list(metric = "globMax", knn = 3), 
                      predict.type = "prob")
 b.lrn4 = makeLearner("classif.classiFunc.knn", 
                      id = "random",
                      par.vals = list(metric = "custom.metric", 
-                                     custom.metric = function(x, y) runif(1)), 
+                                     custom.metric = function(x, y) runif(1),
+                                     knn = 3), 
                      predict.type = "prob")
 
 # chunk 2
@@ -116,7 +117,10 @@ RFE.m = train(RFE.lrn, task = task.train)
 LCE.pred = predict(LCE.m, task = task.test)
 RFE.pred = predict(RFE.m, task = task.test)
 
+# this test train split is very unlucky, need to update it
 measureMulticlassBrier(getPredictionProbabilities(LCE.pred, c("1", "2")),
                        getTaskTargets(task.test))
 measureMulticlassBrier(getPredictionProbabilities(RFE.pred, c("1", "2")),
                        getTaskTargets(task.test))
+
+# ################################################

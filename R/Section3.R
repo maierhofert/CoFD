@@ -21,7 +21,7 @@ library("classiFunc")
 data("BeetleFly")
 set.seed(1)
 train.rows = sample(c(TRUE, FALSE), size = nrow(BeetleFly), 
-                    replace = TRUE, prob = c(0.5, 0.5))
+                    replace = TRUE, prob = c(0.6, 0.4))
 
 # Chunk 4
 nn.mod = classiKnn(classes = BeetleFly[train.rows, "target"], 
@@ -29,7 +29,7 @@ nn.mod = classiKnn(classes = BeetleFly[train.rows, "target"],
 
 ker.mod = classiKernel(classes = BeetleFly[train.rows, "target"], 
                        fdata = BeetleFly[train.rows, 1:512],
-                       h = 15)
+                       h = 1)
 
 # Chunk 5
 pred.nn = predict(nn.mod, newdata = BeetleFly[!train.rows, 1:512],
