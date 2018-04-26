@@ -17,6 +17,7 @@ Overview of repository
   * benchmark_paper: Code for setting up benchmark
   * benchmark_ressults_paper: Plot benchmark results, see /Plots/benchmark/
   * create_learners_paper: Create base learners, ensembles, and reference learners for benchmark
+  * main_semimetrics: Overview of most important semimetrics currently implemented in classiFunc, their hyper parameters, and their possible range.
   * plot_Ensemble: Create LCE and RFE for subsequent plotting
   * plot_EnsemblePartDep_TE, plot_EnsemblePartDep_TE, plot_EnsemblePartDep_TE: create partial dependence plots for how the ensembles (tree, LCE, RFE) depend on their base models, see /Plots/EnsemblePartialDependence
   * plot_beetlefly: Create plots for transition of image to outline to 1d function of BeetleFly data
