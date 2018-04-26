@@ -1,5 +1,6 @@
 library("classiFunc")
 library("dtw")
+library("rucrdtw")
 
 # see all choices
 choices = metricChoices()
@@ -15,8 +16,12 @@ choices = c("L2", "L1", "supremum", "Lp", "dtw", "shortEuclidean", "mean", "relA
 ?classiFunc::computeDistMat
 
 
+
 # the ranges for the hyper parameter values are listed in my mlr branch called classiFunc 
 # in the file /R/RLearner_classif_classiFunc.knn.R
+# still missing are the hyper parameters for dtw, dtwPath, rucrdtw, and rucred
+?dtw
+?rucrdtw
 makeRLearner.classif.classiFunc.knn = function() {
   makeRLearnerClassif(
     cl = "classif.classiFunc.knn",
