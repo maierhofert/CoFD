@@ -64,6 +64,33 @@ for (i in 1:length(data_list)) {
                               target = "target")
 }
 
+# ##############################################################################
+# compute summary statistics for data sets
+tsks
+library("dplyr")
+library("data.table")
+# # adjusting for maximum entropy is not common
+max_ent = function(x) {
+  - x * (1/x * log(1/x))
+}
+plot(max_ent(1:200))
+
+UCR_TSC = data.table(Id = sapply(tsks, getTaskId),
+                     NClasses = sapply(tsks, function(x) x %>%
+                                         getTaskClassLevels %>%
+                                         length),
+                     NObs = sapply(tsks, getTaskSize),
+                     ObsLen = sapply(tsks, function(x) ncol(getTaskData(x)) - 1),
+                     Entropy = sapply(tsks, function(x) getTaskData(x)[,"target"] %>%
+                                        table %>%
+                                        entropy %>%
+                                        round(digits = 2))
+)
+UCR_TSC = mutate(UCR_TSC, adjEntropy = round(Entropy / max_ent(NClasses), digits = 2))
+UCR_TSC = mutate(UCR_TSC, CompCost = round(NObs * ObsLen / 1000, digits = 0))
+UCR_TSC
+summary(UCR_TSC)
+# ##############################################################################
 # select feasible tasks
 name = nobs = obslen = rep(NA, length(tsks))
 for (i in 1:length(tsks)) {
