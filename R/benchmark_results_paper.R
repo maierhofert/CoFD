@@ -20,8 +20,8 @@ perf %>%
 unique(perf[is.na(perf$multiclass.brier),"task.id"])
 
 task.ids = getBMRTaskIds(bmr)
-bmr = getBMRFilteredFeatures(bmr, 
-                             task.ids = task.ids[task.ids != "DiatomSizeReduction"])
+# bmr = getBMRFilteredFeatures(bmr, 
+#                              task.ids = task.ids[task.ids != "DiatomSizeReduction"])
 
 
 
