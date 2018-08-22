@@ -2,6 +2,7 @@
 # for the UCR TSC data
 library("mlr")
 library("ggplot2")
+library("dplyr")
 mytheme = theme_bw(20)
 
 # # tasks and resulting benchmark experiment
@@ -9,10 +10,36 @@ mytheme = theme_bw(20)
 # 2018-03-21bmr_paper.RDS
 
 # read in most current benchmark
-bmr = readRDS("Benchmark_results/2018-03-21bmr_paper.RDS")
+bmr = readRDS("Benchmark_results/2018-08-22bmr_fda.Rds")
 name = "bmr_paper"
 
-# pretty labels for learners
+# check for msising values
+perf = getBMRPerformances(bmr, as.df = TRUE) 
+perf %>%
+  summary()
+unique(perf[is.na(perf$multiclass.brier),"task.id"])
+
+task.ids = getBMRTaskIds(bmr)
+bmr = getBMRFilteredFeatures(bmr, 
+                             task.ids = task.ids[task.ids != "DiatomSizeReduction"])
+
+
+
+# # fix short names and learner ids
+# str(bmr$learners$LCE_noisy, 1)
+# 
+# # Distinguish between dtw and euclidean
+# bmr$learners$KNN_eucl$name = "classiFunc.knn.eucl"
+# bmr$learners$KNN_eucl$short.name = "classiFunc.knn.eucl"
+# 
+# bmr$learners$KNN_dtw$name = "classiFunc.knn.dtw"
+# bmr$learners$KNN_dtw$short.name = "classiFunc.knn.dtw"
+# 
+# # distinguish between noisy and regular learner
+# bmr$learners$LCE_noisy$id = "noisy LCE:knn:{1,5,9,13}_metric:{Euclidean,globMax,globMin,Manhattan,rucrdtw}_nderiv:{0,1,2}"
+# bmr$learners$RFE_noisy$id = "noisy RFE:knn:{1,5,9,13}_metric:{Euclidean,globMax,globMin,Manhattan,rucrdtw}_nderiv:{0,1,2}"
+
+# pretty colors for learners
 lrns.colors = c("grey20", "grey60",
                 "darkorange3",
                 "navy",
@@ -43,15 +70,18 @@ lrns.colors = c("grey20", "grey60",
 lrns.ids = getBMRLearnerIds(bmr)
 order.lrns = 1:length(getBMRLearnerIds(bmr))
 
+labels = c("1nn.eucl", "1nn.dtw", "knn.tuned.eucl", "kernel.tuned.eucl",
+           "LCE", "LCE.noisy", "RFE", "RFE.noisy")
+
 
 # # data frame containing results
 # getBMRAggrPerformances(bmr, as.df = TRUE)
-p.dots = plotBMRSummary(bmr, trafo = "rank", pretty.names = TRUE, 
+p.dots = plotBMRSummary(bmr, trafo = "rank", pretty.names = F, 
                         jitter = 0.05, pointsize = 10L) +
-  guides(col = guide_legend(ncol = 2, override.aes = aes(size = 4))) +
+  # guides(col = guide_legend(ncol = 2, override.aes = aes(size = 4))) +
   scale_x_continuous(breaks = 1:17, minor_breaks = 1:15) +
   scale_color_manual(values = lrns.colors, 
-                     limits = getBMRLearnerShortNames(bmr)[order.lrns],
+                     labels = labels,
                      name = "")  +
   xlab("Rank of Brier score") +
   mytheme +
@@ -62,10 +92,9 @@ p.dots
 ggsave(paste0("Plots/benchmark/", name, "_dots.pdf"), p.dots, 
        width = 13, height = 20)
 
-p.bars = plotBMRRanksAsBarChart(bmr, pretty.names = TRUE,
-                                order.lrns = getBMRLearnerIds(bmr)[order.lrns]) + 
+p.bars = plotBMRRanksAsBarChart(bmr, pretty.names = F) + 
   scale_fill_manual(values = lrns.colors, 
-                    limits = getBMRLearnerShortNames(bmr)[order.lrns], 
+                    labels = labels,
                     name = "Model") +
   scale_x_discrete(breaks = 1:17, 
                    labels = c(1, "", 3, "", 5, "", 7, "", 9, "", 
@@ -81,12 +110,11 @@ ggsave(paste0("Plots/benchmark/", name, "_bars.pdf"), p.bars,
 # visualize benchmark results
 plotBMRBoxplots(bmr, measure = timeboth, pretty.names = FALSE,
                 facet.wrap.ncol = 2)
-p.box = plotBMRBoxplots(bmr, measure = multiclass.brier, pretty.names = TRUE, 
-                        facet.wrap.ncol = 2L,
-                        order.lrns = getBMRLearnerIds(bmr)[order.lrns]) +
+p.box = plotBMRBoxplots(bmr, measure = multiclass.brier, pretty.names = F, 
+                        facet.wrap.ncol = 2L) +
   geom_boxplot(aes(fill = learner.id)) +
   scale_fill_manual(values = lrns.colors,
-                    limits = getBMRLearnerShortNames(bmr)[order.lrns],
+                    labels = labels,
                     name = "") +
   ylab("Brier score") +
   mytheme +
@@ -109,13 +137,41 @@ friedmanPostHocTestBMR(bmr, measure = multiclass.brier)
 # critical difference diagram
 g = generateCritDifferencesData(bmr, measure = multiclass.brier,
                                 p.value = 0.05, test = "nemenyi")
-p.cd = plotCritDifferences(g, pretty.names = TRUE) +
+
+
+library("dplyr")
+# helper function to remove a layer
+remove_geom <- function(ggplot2_object, geom_type) {
+  # Delete layers that match the requested type.
+  layers <- lapply(ggplot2_object$layers, function(x) {
+    if (class(x$geom)[1] == geom_type) {
+      NULL
+    } else {
+      x
+    }
+  })
+  # Delete the unwanted layers.
+  layers <- layers[!sapply(layers, is.null)]
+  ggplot2_object$layers <- layers
+  ggplot2_object
+}
+
+# Careful, this requires manual work
+p.cd = plotCritDifferences(g, pretty.names = T) %>%
+  remove_geom("GeomText") +
+  geom_text(aes_string("xend", "yend", color = "learner.id", hjust = "right"), 
+            label = labels, vjust = -1) +
+  # manually insert position of cd label
+  annotate("text", label = stringi::stri_paste("Critical Difference =", 
+                                      round(g$cd.info$cd, 2), sep = " "), 
+           x = 4.5, y = 4 + 0.05) +
   scale_color_manual(values = lrns.colors,
-                     limits = lrns.ids,
+                     labels = labels,
                      name = "learner") +
   theme(text = element_text(size = 10),
         plot.margin = unit(c(2, 1, 0.5, 0.5), "lines"))
 p.cd
+
 ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd, 
        width = 0.8*13, height = 0.8*9)
 
@@ -213,4 +269,3 @@ ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd,
 # 
 # ggsave(paste0("Plots/benchmark/", name, "_ref_mod_cd.pdf"),
 #        plot = p.cd_ref_mod, width = 0.8*13, height = 0.8*9)
-# 
