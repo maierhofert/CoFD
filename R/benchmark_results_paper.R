@@ -10,7 +10,7 @@ mytheme = theme_bw(20)
 # 2018-03-21bmr_paper.RDS
 
 # read in most current benchmark
-bmr = readRDS("Benchmark_results/2018-08-22bmr_fda.Rds")
+bmr = readRDS("Benchmark_results/2018-09-12bmr_fda.Rds")
 name = "bmr_paper"
 
 # check for msising values
