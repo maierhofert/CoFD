@@ -3,7 +3,8 @@
 library("mlr")
 library("ggplot2")
 library("dplyr")
-library("stringi"
+library("stringi")
+library("forcats")
 
 mytheme = theme_bw(20)
 
@@ -44,6 +45,82 @@ order.lrns = 1:length(getBMRLearnerIds(bmr))
 
 labels = c("1nn.eucl", "1nn.dtw", "knn.tuned.eucl", "kernel.tuned.eucl",
            "LCE", "LCE.noisy", "RFE", "RFE.noisy")
+
+
+##########################################################################################
+# Table 2: Benchmark Results -------------------------------------------------------------
+df2 = getBMRAggrPerformances(bmr, as.df = TRUE)
+df2$learner.short = stri_replace_first_regex(df2$learner.id, "classif.classiFunc.", "")
+df2$learner.short = stri_replace_first_regex(df2$learner.short, ":\\{.*\\}", "")
+df2$learner.short = stri_replace_first_regex(df2$learner.short, ":knn", "")
+df2$learner.short = stri_replace_first_regex(df2$learner.short, "_nderiv:0", "")
+df2$learner.short = stri_replace(df2$learner.short, "knn.tuned", "knn.tuned.eucl")
+df2$learner.short = stri_replace(df2$learner.short, "kernel.tuned", "kernel.tuned.eucl")
+
+df2 %>%
+  group_by(task.id) %>%
+  mutate(
+    rnk_brier = dense_rank(multiclass.brier.test.mean),
+    rnk_acc   = dense_rank(desc(acc.test.mean))
+  ) %>%
+  group_by(learner.short) %>%
+  summarize(
+    mean_brier = mean(multiclass.brier.test.mean),
+    median_brier = median(multiclass.brier.test.mean),
+    mean_rnk_brier = mean(rnk_brier),
+    mean_accuracy = mean(acc.test.mean),
+    median_accuracy = median(acc.test.mean),
+    mean_rnk_acc = mean(rnk_acc)
+  ) %>%
+  write.csv("table_brier_acc.csv")
+
+
+df3 = df2 %>%
+  group_by(task.id) %>%
+  mutate(
+    rnk_brier = dense_rank(multiclass.brier.test.mean),
+    rnk_acc   = dense_rank(desc(acc.test.mean))
+  ) %>%
+  group_by(learner.short) %>%
+  summarize(
+    mean_brier = mean(multiclass.brier.test.mean),
+    median_brier = median(multiclass.brier.test.mean),
+    mean_rnk_brier = mean(rnk_brier),
+    mean_accuracy = mean(acc.test.mean),
+    median_accuracy = median(acc.test.mean),
+    mean_rnk_acc = mean(rnk_acc)
+  ) %>%
+  rename(learner = learner.short)
+
+write.csv(df3, "table_brier_acc.csv")
+
+
+library(knitr)
+library(kableExtra)
+
+
+make_bold = function(x, min = TRUE, digits = 3) {
+  if (is.numeric(x)) {
+    x = round(x, digits)
+    if (min) {
+      x = cell_spec(x, "latex", bold = ifelse(x == round(min(x), digits), TRUE, FALSE))
+    } else {
+      x = cell_spec(x, "latex", bold = ifelse(x == round(max(x), digits), TRUE, FALSE))
+    }
+  }
+  return(x)
+}
+
+df3 %>%
+  mutate(
+    mean_brier = make_bold(mean_brier),
+    median_brier = make_bold(median_brier),
+    mean_rnk_brier = make_bold(mean_rnk_brier),
+    mean_accuracy = make_bold(mean_accuracy, FALSE),
+    median_accuracy = make_bold(median_accuracy, FALSE),
+    mean_rnk_acc = make_bold(mean_rnk_acc)
+  ) %>%
+  knitr::kable(format = "latex", digits = 3, escape = F)
 
 
 ##########################################################################################
@@ -97,16 +174,6 @@ ggsave(paste0("Plots/benchmark/", name, "_cd.pdf"), p.cd,
 
 ##########################################################################################
 # Figure 9: Boxplots ---------------------------------------------------------------------
-library(stringi)
-df2 = getBMRAggrPerformances(bmr, as.df = TRUE)
-df2$learner.short = stri_replace_first_regex(df2$learner.id, "classif.classiFunc.", "")
-df2$learner.short = stri_replace_first_regex(df2$learner.short, ":\\{.*\\}", "")
-df2$learner.short = stri_replace_first_regex(df2$learner.short, ":knn", "")
-df2$learner.short = stri_replace_first_regex(df2$learner.short, "_nderiv:0", "")
-
-length(unique(df2$task.id))
-
-sum(df2$timeboth.test.mean * 30 / 60 / 60)
 
 pfull =
   ggplot(df2, aes(x = learner.short, y = multiclass.brier.test.mean, fill = learner.short)) +
