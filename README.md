@@ -1,14 +1,33 @@
 # CoFD
+
 Classification of Functional Data
 
-Overview of repository
-* Benchmark_results: Folder containing the .bmr files created by the benchmark experiments
-* Data: Folder containing the data from the UCR TSC repository 
+## Downloading the repository
+
+To clone the repository, use:
+
+```
+git clone --recurse-submodules https://github.com/maierhofert/CoFD  # or git://
+```
+
+## Overview of repository
+
+* benchmark_repo: Code for the benchmark.
+  This is a git submodule. This repository contains all the code and descriptions for
+  reproducibility. See `benchmark_repo/README.md`.
+
+* Benchmark_results: Folder containing the Benchmark Result (.bmr) files created by the benchmark experiments‌.
+  The state with the latest date stamp is used to produce figures in code.
+
+* Data: Folder containing the data from the UCR TSC repository
+
 * Literatur: Miscellaneous papers that are related to the paper. Not a complete list of all cited papers
+
 * Plots: all plots generated and downloaded from the internet for the paper
   * BeetleFly: Original images of beetles and flies, extracted outlines for one beetle and one fly
   * EnsemblePartialDependence: partial dependence plots for the RFE and the LCE for all base learner combinations
   * benchmark: plots for results of benchmark experiments
+
 * R: R code
   * old: Unused R code. Can be deleted before publicising
   * Section3, Section4: R code chunks that are in paper
