@@ -16,7 +16,7 @@ mytheme = theme_bw(20)
 # Set up data and colors -----------------------------------------------------------------
 
 # read in most current benchmark
-bmr = bmr = readRDS("Benchmark_results/2019-11-25bmr_paper.RDS")
+bmr = readRDS("Benchmark_results/2019-11-25bmr_paper.RDS")
 name = "bmr_paper"
 
 # check for msising values
@@ -46,6 +46,21 @@ order.lrns = 1:length(getBMRLearnerIds(bmr))
 labels = c("1nn.eucl", "1nn.dtw", "knn.tuned.eucl", "kernel.tuned.eucl",
            "LCE", "LCE.noisy", "RFE", "RFE.noisy")
 
+# helper function to remove a layer
+remove_geom <- function(ggplot2_object, geom_type) {
+  # Delete layers that match the requested type.
+  layers <- lapply(ggplot2_object$layers, function(x) {
+    if (class(x$geom)[1] == geom_type) {
+      NULL
+    } else {
+      x
+    }
+  })
+  # Delete the unwanted layers.
+  layers <- layers[!sapply(layers, is.null)]
+  ggplot2_object$layers <- layers
+  ggplot2_object
+}
 
 ##########################################################################################
 # Table 2: Benchmark Results -------------------------------------------------------------
